@@ -69,7 +69,7 @@ for _, p in ipairs(killFolder:GetChildren()) do
 	end)
 end
 
--- Checkpoints: set stage + teleport on top
+-- Checkpoints: set stage + teleport on top (debounced)
 for _, cp in ipairs(checkpoints:GetChildren()) do
 	local idx = tonumber(cp.Name:match("%d+"))
 	if idx then
@@ -77,6 +77,11 @@ for _, cp in ipairs(checkpoints:GetChildren()) do
 			local hum, char = getHumanoid(hit)
 			local plr = char and Players:GetPlayerFromCharacter(char)
 			if hum and hum.Health > 0 and plr then
+				if char:GetAttribute("CPLock") then return end
+				char:SetAttribute("CPLock", true)
+				task.delay(1, function()
+					if char then char:SetAttribute("CPLock", nil) end
+				end)
 				local st = stageValues[plr]
 				if st and idx > st.Value then
 					st.Value = idx
